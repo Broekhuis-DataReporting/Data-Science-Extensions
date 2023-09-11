@@ -1,0 +1,4 @@
+.metals
+.vscode
+target
+spark-datasource-rest/target
