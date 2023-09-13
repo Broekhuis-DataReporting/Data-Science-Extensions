@@ -61,8 +61,6 @@ object RestConnectorUtil {
       httpc = httpc.header("Authorization",authToken)
     }
 
-    print(httpc + "\n")
-
     val conns = connStr.split(":")
     val connProp = Array(conns(0).toInt, conns(1).toInt)
 
@@ -84,7 +82,7 @@ object RestConnectorUtil {
       httpc.oauth(consumer, accessToken)
     }
 
-    print("in callRestAPI final http : " + httpc + "\n")
+    //print("in callRestAPI final http : " + httpc + "\n")
 
     val resp = (respType : @switch) match {
       case "BODY" => httpc.asString.body
@@ -94,8 +92,6 @@ object RestConnectorUtil {
       case "HEADERS" => httpc.asString.headers
       case "LOCATION" => httpc.asString.location.mkString(" ")
     }
-
-    print("result: " + resp + "\n")
 
     resp
   }

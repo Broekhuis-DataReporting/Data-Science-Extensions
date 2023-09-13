@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'release-*'
+
+jobs:
+  release:
+    name: Release the package
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Setup Maven Action
+      uses: s4u/setup-maven-action@v1.9.0
+      with:
+        java-version: 11
+    # - name: setup-scala
+    #   uses: olafurpg/setup-scala@v10
+    #   with:
+    #     java-version: openjdk@1.11
+    - name: Build library using maven
+      run: mvn clean install -pl spark-datasource-rest -DskipTests -Dscalastyle.skip=true
+    - name: create release and push Jar files
+      uses: ncipollo/release-action@v1
+      with:
+        allowUpdates: true
+        artifacts: "./spark-datasource-rest/target/*.jar"
