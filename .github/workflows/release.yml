@@ -18,6 +18,8 @@ jobs:
       uses: s4u/setup-maven-action@v1.9.0
       with:
         java-version: 11
+    - name: set version in pom.xml before build
+      run: mvn versions:set -DnewVersion=${{ github.ref_name }}
     - name: Build library using maven
       run: mvn clean install -pl spark-datasource-rest -DskipTests -Dscalastyle.skip=true
     - name: create release and push Jar files
