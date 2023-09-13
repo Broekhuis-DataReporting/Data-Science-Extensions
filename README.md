@@ -2,9 +2,24 @@
 
 Fork of original data science extensions library, with some specific alterations.
 
-# Installation
+# Building from source
+
+First install maven and java:
+
+```
+apt-get install openjdk-11-jre-headless
+apt-get install maven
+```
+
+## For debugging
 
 mvn -Drat.ignoreErrors=true package
+
+## Release
+
+```
+mvn clean install -pl spark-datasource-rest -DskipTests -Dscalastyle.skip=true
+```
 
 # Use in spark-shell
 
