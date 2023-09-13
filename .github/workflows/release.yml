@@ -18,10 +18,6 @@ jobs:
       uses: s4u/setup-maven-action@v1.9.0
       with:
         java-version: 11
-    # - name: setup-scala
-    #   uses: olafurpg/setup-scala@v10
-    #   with:
-    #     java-version: openjdk@1.11
     - name: Build library using maven
       run: mvn clean install -pl spark-datasource-rest -DskipTests -Dscalastyle.skip=true
     - name: create release and push Jar files
