@@ -23,12 +23,11 @@ mvn clean install -pl spark-datasource-rest -DskipTests -Dscalastyle.skip=true
 
 # Use in spark-shell
 
-run: `spark-shell`
+run: `spark-shell --jars "spark-datasource-rest/target/spark-datasource-rest_2.12-3.3.1-SNAPSHOT.jar"`
 
 In the scala session, run:
 
-```
-:require spark-datasource-rest/target/spark-datasource-rest_2.12-3.3.1-SNAPSHOT.jar
+``` 
 import org.apache.dsext.spark.datasource.rest._
 ```
 
