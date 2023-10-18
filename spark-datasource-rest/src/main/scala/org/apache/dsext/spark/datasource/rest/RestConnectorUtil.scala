@@ -96,9 +96,15 @@ object RestConnectorUtil {
     resp
   }
 
+
   private def addQryParmToUri(uri: String, data: String) : String = {
-      if (uri contains "?") uri + "&" + data else uri + "?" + data
+    if (data == ""){
+      uri
+    } else {
+       if (uri contains "?") uri + "&" + data else uri + "?" + data
+    }
   }
+
 
   private def convertToQryParm(data: String) : List[(String, String)] = {
       data.substring(1, data.length - 1).split(",").map(_.split(":"))

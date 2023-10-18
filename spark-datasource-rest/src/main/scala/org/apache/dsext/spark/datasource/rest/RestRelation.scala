@@ -48,7 +48,7 @@ case class RESTRelation(
 
   override def buildScan() : RDD[Row] = {
 
-    // print("in buildScan " + "\n")
+    print("in buildScan " + "\n")
     sparkSession.read.schema(schema).json(restRdd).rdd
 
   }
@@ -65,12 +65,12 @@ case class RESTRelation(
   private val inputKeys = restOptions.inputKeys
 
   private val inputDf = if (restOptions.inputType == "tableName") {
-        sparkSession.sql(s"select *  from $inputs")
+    sparkSession.sql(s"select *  from $inputs")
   }
   else {
-        import sparkSession.implicits._
-        val inputStrArr = inputs.split(restOptions.inputStrRecordDelimeter)
-        sparkSession.sparkContext.parallelize(inputStrArr).toDF("strInput")
+    import sparkSession.implicits._
+    val inputStrArr = inputs.split(restOptions.inputStrRecordDelimeter)
+    sparkSession.sparkContext.parallelize(inputStrArr).toDF("strInput")
   }
 
   private val columnNames : Array[String] = inputDf.columns
@@ -78,8 +78,14 @@ case class RESTRelation(
   private val restRdd : RDD[String] = {
 
     val parts = restOptions.inputPartitions.toInt
-    // print("in restRdd  : " + parts +   "\n")
-    inputDf.rdd.repartition(parts).map(r => callRest(r))
+    print("in restRdd  : " + parts +   "\n")
+    if (inputDf.count != 0) {
+      inputDf.rdd.repartition(parts).map(r => callRest(Some(r)))
+
+    } else {
+        sparkSession.sparkContext.parallelize(List(callRest()))
+    }
+    
 
   }
 
@@ -97,21 +103,24 @@ case class RESTRelation(
       // print("in schema  - not a strictOnce case - sample pcnt : "
       // + samplePcnt + " , sample count : " + sampleDf.count +
       //  ", final sample count : " + finalSampleDf.count + "\n")
-      val outRdd = finalSampleDf.rdd.map(r => callRest(r)).asInstanceOf[RDD[String]]
+      val outRdd = finalSampleDf.rdd.map(r => callRest(Some(r))).asInstanceOf[RDD[String]]
       sparkSession.read.json(outRdd).schema
     }
 
   }
 
-  private def callRest(data : Row) : String = {
+private def callRest(data : Option[Row] = None ) : String = {
+    val inputDataStr = ""
+    val valuesArr = Array("")
+    if (data != None){
 
-    val valArray = data.toSeq.toArray.map(_.toString)
+      val valArray = data.toSeq.toArray.map(_.toString)
 
-    val valuesArr = if (restOptions.inputType == "tableName") valArray else {
-        valArray(0).split(restOptions.inputStrFieldDelimeter)
-    }
-
-    val inputDataStr = prepareInputData(valuesArr)
+      val valuesArr = if (restOptions.inputType == "tableName") valArray else {
+          valArray(0).split(restOptions.inputStrFieldDelimeter)
+        }
+      val inputDataStr = prepareInputData(valuesArr)
+    } 
 
     val contentType = "application/" + restOptions.postInputFormat
     val userCred = if (restOptions.userId == "") ""
@@ -136,6 +145,7 @@ case class RESTRelation(
 
     val inputDataKeys = restOptions.inputKeys
     val keyArr = if (inputDataKeys == "") columnNames else inputDataKeys.split(",")
+    print("test")
 
     if(restOptions.method == "GET") {
         RestConnectorUtil.prepareTextInput(keyArr, valArray)
